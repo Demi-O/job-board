@@ -1,5 +1,5 @@
 import { getCompany } from './db/companies.js';
-import { getJobs } from './db/jobs.js';
+import { getJob, getJobs } from './db/jobs.js';
 
 function toISODate(value) {
   return value.slice(0, 'yyyy-mm-dd'.length);
@@ -7,6 +7,7 @@ function toISODate(value) {
 
 export const resolvers = {
   Query: {
+    job: (_root, { id }) => getJob(id),
     jobs: () => getJobs(),
   },
   
