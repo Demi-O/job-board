@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql';
 import { getCompany } from './db/companies.js';
-import { createJob, deleteJob, getJob, getJobs, getJobsByCompany } from './db/jobs.js';
+import { createJob, deleteJob, getJob, getJobs, getJobsByCompany, updateJob } from './db/jobs.js';
 
 function toISODate(value) {
   return value.slice(0, 'yyyy-mm-dd'.length);
@@ -9,6 +9,12 @@ function toISODate(value) {
 function notFoundError(message) {
   return new GraphQLError(message, {
     extensions: { code: 'NOT_FOUND' },
+  });
+}
+
+function unauthorizedError(message) {
+  return new GraphQLError(message, {
+    extensions: { code: 'UNAUTHORIZED' },
   });
 }
 
@@ -28,12 +34,18 @@ export const resolvers = {
   },
 
   Mutation: {
-    createJob: (_root, { input : { title, description } }) => {
-      const companyId = 'FjcJCHJALA4i';
+    createJob: (_root, { input : { title, description } }, { user }) => {
+      if (!user) {
+        return unauthorizedError('Missing authentication');
+      }
+
+      const companyId = user.companyId;
       return createJob({ companyId, title, description });
     },
 
     deleteJob: (_root, { id }) => deleteJob(id),
+
+    updateJob: (_root, { input: { id, title, description }}) => updateJob({ id, title, description})
   },
 
   Company: {
