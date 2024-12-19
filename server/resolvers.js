@@ -31,7 +31,7 @@ export const resolvers = {
       if (!job) return notFoundError(`No job found with id ${id}`);
       return job;
     },
-    jobs: () => getJobs(),
+    jobs: (_root, { limit }) => getJobs(limit),
   },
 
   Mutation: {
